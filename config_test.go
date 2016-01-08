@@ -5,7 +5,7 @@ import "testing"
 func TestLoadConfigDir(t *testing.T) {
 	config, err := LoadConfigDir("example/")
 	if err != nil {
-		t.Errorf("LoadConfigDir Fail: %s", err)
+		t.Fatalf("LoadConfigDir Fail: %s", err)
 	}
 
 	if config.RabbitMQ.Host != "10.0.0.1" {

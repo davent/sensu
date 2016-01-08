@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -57,6 +58,10 @@ func LoadConfigDir(config_dir string) (config *Config, err error) {
 
 	// Load main config file
 	data, err := ioutil.ReadFile(config_file)
+	if err != nil {
+		return nil, err
+	}
+
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err
@@ -65,10 +70,16 @@ func LoadConfigDir(config_dir string) (config *Config, err error) {
 	// Load additional config in conf.d
 	files, _ := ioutil.ReadDir(config_dir + "/conf.d/")
 	for _, f := range files {
-		data, err = ioutil.ReadFile(config_dir + "/conf.d/" + f.Name())
-		err = json.Unmarshal(data, &config)
-		if err != nil {
-			return nil, err
+		if !f.IsDir() && strings.HasSuffix(f.Name(), ".json") {
+			data, err = ioutil.ReadFile(config_dir + "/conf.d/" + f.Name())
+			if err != nil {
+				return nil, err
+			}
+
+			err = json.Unmarshal(data, &config)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
